@@ -4,9 +4,10 @@
 #include <list>
 #include <SFML/Graphics.hpp>
 #include "Menu.h"
-using namespace std;
+#include "TextBox.h"
+#include "Button.h"
 
-sf::Font font;
+using namespace std;
 
 class Hash {
     int size;
@@ -16,7 +17,7 @@ public:
     Hash(int sizemap);
     void insertit(int key);
     void deleteit(int key);
-    void displayMap(sf::RenderWindow &window);
+    void displayMap(sf::RenderWindow &window, sf::Font &font);
 };
 
 Hash::Hash(int sizemap) {
@@ -38,7 +39,7 @@ void Hash::deleteit(int key) {
     if (elem != map[index].end()) map[index].erase(elem);
 }
 
-void Hash::displayMap(sf :: RenderWindow &window) {
+void Hash::displayMap(sf :: RenderWindow &window, sf::Font &font) {
     sf::RectangleShape cell(sf::Vector2f(200, 30));
     sf::RectangleShape title(sf::Vector2f(200, 30));
 
@@ -50,11 +51,6 @@ void Hash::displayMap(sf :: RenderWindow &window) {
 
     title.setSize(sf::Vector2f(300, 60));
     title.setPosition(700, 5);
-
-    if (!font.loadFromFile("font.ttf"))
-    {
-        std::cout << "Error in opening font";
-    }
 
     text.setFont(font);
     text.setFillColor(sf :: Color :: Black);
@@ -97,79 +93,111 @@ void Hash::displayMap(sf :: RenderWindow &window) {
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(1400, 900), "Main window");
+
+    sf::Font font;
+    if (!font.loadFromFile("font.ttf"))
+    {
+        std::cout << "Error in opening font";
+    }
+
     Menu menu(window.getSize().x, window.getSize().y);
 
-    sf::RectangleShape bt_insert(sf::Vector2f(270, 60));
-    sf::RectangleShape bt_delete(sf::Vector2f(270, 60));
-    sf::Text insert_text;
-    sf::Text delete_text;
+    //sf::RectangleShape bt_insert(sf::Vector2f(270, 60));
+    //sf::RectangleShape bt_delete(sf::Vector2f(270, 60));
+    //sf::Text insert_text;
+    //sf::Text delete_text;
 
-    bt_insert.setFillColor(sf::Color(102, 102, 153));
+    //bt_insert.setFillColor(sf::Color(102, 102, 153));
 
-    insert_text.setFont(font);
-    insert_text.setFillColor(sf::Color::Black);
+    //insert_text.setFont(font);
+    //insert_text.setFillColor(sf::Color::Black);
 
-    insert_text.Bold;
-    delete_text = insert_text;
+    //insert_text.Bold;
+    //delete_text = insert_text;
 
-    insert_text.setString("Insert an element");
-    delete_text.setString("Delete an element");
+    //insert_text.setString("Insert an element");
+    //delete_text.setString("Delete an element");
 
-    insert_text.setPosition(10, 10);
-    delete_text.setPosition(310, 10);
+    //insert_text.setPosition(10, 10);
+    //delete_text.setPosition(310, 10);
 
-    bt_delete = bt_insert;
-    bt_insert.setPosition(5, 10);
-    bt_delete.setPosition(300, 10);
+    //bt_delete = bt_insert;
+    //bt_insert.setPosition(5, 10);
+    //bt_delete.setPosition(300, 10);
 
     vector<int>a;
-    int element;
+    int element = 0;
     int menuNum;
     Hash h(7);
 
+    Textbox textbox1(20, sf::Color::White, false);
+    textbox1.setFont(font);
+    textbox1.setPosition({ 10, 90 });
+    textbox1.setLimit(true, 5);
+
+    Button insert_btn("Insert an element", { 270, 60 }, 30, sf::Color(102, 102, 153), sf::Color::White);
+    insert_btn.setPosition({ 5, 10 });
+    insert_btn.setFont(font);
     while (window.isOpen())
     {
         sf::Event event;
+
+        //if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+        //    textbox1.setSelected(true);
+        //}
+        //else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+        //    textbox1.setSelected(false);
+        //}
+
         while (window.pollEvent(event))
         {
-            // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed)
+            switch (event.type) {
+
+            case sf::Event::Closed:
                 window.close();
+
+            case sf::Event::TextEntered:
+                textbox1.typedOn(event);
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+                    stringstream el(textbox1.getText());
+                    el >> element;
+                    h.insertit(element);
+                    h.displayMap(window, font);
+                    textbox1.setSelected(false);
+                }
+                break;
+
+            case sf::Event::MouseMoved:
+                if (insert_btn.isMouseOver(window)) {
+                    insert_btn.setBackColor(sf::Color::Red);
+                }
+                else {
+                    insert_btn.setBackColor(sf::Color(102, 102, 153));
+                }
+                break;
+
+            case sf::Event::MouseButtonPressed:
+
+                if (insert_btn.isMouseOver(window)) {
+                    textbox1.setSelected(true);
+                }
+            }
         }
 
-        window.clear(sf::Color::Black);
-        if (sf::IntRect(0, 0, 270, 60).contains(sf::Mouse::getPosition(window))) { bt_insert.setFillColor(sf::Color(255, 200, 227)); menuNum = 1; }
-        if (sf::IntRect(300, 0, 500, 60).contains(sf::Mouse::getPosition(window))) { bt_delete.setFillColor(sf::Color(255, 200, 227)); menuNum = 2; }
+        //if (sf::IntRect(0, 0, 270, 60).contains(sf::Mouse::getPosition(window))) { bt_insert.setFillColor(sf::Color(255, 200, 227)); menuNum = 1; }
+        //if (sf::IntRect(300, 0, 500, 60).contains(sf::Mouse::getPosition(window))) { bt_delete.setFillColor(sf::Color(255, 200, 227)); menuNum = 2; }
 
-        while (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-        {
-            if (menuNum == 1) { //insert
-                bt_insert.setFillColor(sf::Color(102, 102, 153));
-                cout << "Enter the number you want to add:";
-                cin >> element;
-                h.insertit(element);
-                h.displayMap(window);
-                menuNum = 0;
-            }
 
-            if (menuNum == 2) { //delete
-                bt_delete.setFillColor(sf::Color(102, 102, 153));
-                cout << "Enter the number you want to delete:";
-                cin >> element;
-                h.deleteit(element);
-                h.displayMap(window);
-                menuNum = 0;
-            }
-        }
         window.clear();
 
-        menu.draw(window);
-        window.draw(bt_insert);
-        window.draw(bt_delete);
-        window.draw(delete_text);
-        window.draw(insert_text);
-
-        h.displayMap(window);
+        //menu.draw(window);
+        textbox1.drawTo(window);
+        //window.draw(bt_insert);
+        //window.draw(bt_delete);
+        //window.draw(delete_text);
+        //window.draw(insert_text);
+        insert_btn.drawTo(window);
+        h.displayMap(window, font);
         window.display();
         }
     return 0;
