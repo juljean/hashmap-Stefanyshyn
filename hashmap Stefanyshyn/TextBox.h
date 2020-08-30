@@ -15,12 +15,7 @@ public:
 		textbox.setCharacterSize(size);
 		textbox.setFillColor(color);
 		isSelected = sel;
-		if (sel) {
-			textbox.setString("_");
-		}
-		else {
-			textbox.setString("");
-		}
+		sel ? textbox.setString("_") : textbox.setString("");
 	}
 
 	void setFont(sf::Font &font) {
@@ -38,6 +33,7 @@ public:
 
 	void setSelected(bool sel) {
 		isSelected = sel;
+		textbox.setString("_");
 		if (!sel) {
 			std::string t = text.str();
 			std::string newT = "";
@@ -75,6 +71,9 @@ public:
 		}
 	}
 
+	void deletestr() {
+		textbox.setString("");
+	}
 private:
 	sf::Text textbox;
 	std::ostringstream text;

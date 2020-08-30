@@ -5,12 +5,11 @@
 class Menu
 {
 public:
-	Menu(float width, float height);
+	Menu(int k);
 	~Menu();
 
-	void draw(sf::RenderWindow& window);
-	void MoveUp();
-	void MoveDown();
+	void draw();
+	int GetPressed() { return selectedItemIndex; }
 
 private:
 	int selectedItemIndex;

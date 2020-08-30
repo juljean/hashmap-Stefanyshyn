@@ -1,24 +1,69 @@
 #include "Menu.h"
+#include "Button.h"
+#include <iostream>
 
-Menu::Menu(float width, float height) {
-	font.loadFromFile("font.ttf");
-
-	menu[0].setFont(font);
-	menu[0].setFillColor(sf::Color::Red);
-	menu[0].setString("Start");
-	menu[0].setPosition(sf::Vector2f(width / 2, height / MAX_NUMBER_OF_ITEMS * 0.5));
-
-	menu[1].setFont(font);
-	menu[1].setFillColor(sf::Color::White);
-	menu[1].setString("Exit");
-	menu[1].setPosition(sf::Vector2f(width / 2, height / MAX_NUMBER_OF_ITEMS * 1.5));
-
+Menu::Menu(int k) {
 }
 
 Menu::~Menu() {
 
 }
 
-void Menu::draw(sf::RenderWindow &window) {
-	for (int i = 0; i < MAX_NUMBER_OF_ITEMS; i++) window.draw(menu[i]);
+void Menu::draw() {
+	sf::RenderWindow MenuW(sf::VideoMode(1200, 700), "Menu Bar");
+	sf::Texture menuTexture;
+	menuTexture.loadFromFile("menuBack.jpg");
+	sf::Sprite menuBack(menuTexture);
+	menuBack.scale(2.2, 2.2);
+
+	font.loadFromFile("font.ttf");
+
+	Button start_btn("Start", { 130, 60 }, 30, sf::Color(140, 140, 140), sf::Color::White);
+	start_btn.setPosition({ 900, 120 });
+	start_btn.setFont(font);
+
+	Button exit_btn("Exit", { 130, 60 }, 30, sf::Color(140, 140, 140), sf::Color::White);
+	exit_btn.setPosition({ 900, 460 });
+	exit_btn.setFont(font);
+
+	std::string note = "Topic: CHAINED HASHMAP\n\n\n\n\n\n\n\nCreated by Nazar Stefanyshyn KM-91";
+	Button notif_btn(note , { 600, 400 }, 30, sf::Color(0, 0, 0, 85), sf::Color::White);
+	notif_btn.setPosition({ 60, 120 });
+	notif_btn.setFont(font);
+
+	while (MenuW.isOpen())
+	{
+		sf::Event event;
+		while (MenuW.pollEvent(event)) {
+			switch (event.type) {
+
+			case sf::Event::Closed:
+				MenuW.close();
+
+			case sf::Event::MouseMoved:
+				if (start_btn.isMouseOver(MenuW)) start_btn.setBackColor(sf::Color::Red);
+
+				else if (exit_btn.isMouseOver(MenuW)) exit_btn.setBackColor(sf::Color::Red);
+
+				else {
+					start_btn.setBackColor(sf::Color(140, 140, 140));
+					exit_btn.setBackColor(sf::Color(140, 140, 140));
+				}
+				break;
+
+			case sf::Event::MouseButtonPressed:
+				if (start_btn.isMouseOver(MenuW) || exit_btn.isMouseOver(MenuW)) {
+					MenuW.close();
+					return;
+				}
+			}
+		}
+	MenuW.clear();
+	MenuW.draw(menuBack);
+	start_btn.drawTo(MenuW);
+	exit_btn.drawTo(MenuW);
+	notif_btn.drawTo(MenuW);
+	MenuW.display();
+	}
+
 }
