@@ -8,7 +8,7 @@ public:
 	Menu(int k);
 	~Menu();
 
-	void draw();
+	bool draw();
 	int GetPressed() { return selectedItemIndex; }
 
 private:

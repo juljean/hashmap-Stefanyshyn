@@ -9,6 +9,50 @@
 
 using namespace std;
 
+int int_val() {
+    int inp = 0;
+    while (1) {
+        if (scanf_s("%d", &inp)) {
+            if (getchar() == '\n') {
+                if (inp >= 0) return inp;
+                else {
+                    printf("WRONG VALUE\n");
+                }
+            }
+            else
+            {
+                while (getchar() != '\n');
+                printf("WRONG VALUE\n");
+            }
+        }
+        else {
+            while (getchar() != '\n');
+            printf("WRONG VALUE\n");
+        }
+    }
+}
+
+float float_val(const char* prompt) {
+    float inp = 0;
+    while (1) {
+        printf("%s", prompt);
+        if (scanf_s("%f", &inp)) {
+            if (getchar() == '\n') {
+                return inp;
+            }
+            else
+            {
+                while (getchar() != '\n');
+                printf("WRONG VALUE\n");
+            }
+        }
+        else {
+            while (getchar() != '\n');
+            printf("WRONG VALUE\n");
+        }
+    }
+}
+
 class Hash {
     int size;
     list<int>* map;
@@ -41,35 +85,21 @@ void Hash::deleteit(int key) {
 
 void Hash::displayMap(sf :: RenderWindow &window, sf::Font &font) {
     sf::RectangleShape cell(sf::Vector2f(200, 30));
-    sf::RectangleShape title(sf::Vector2f(200, 30));
+    cell.setFillColor(sf::Color(0,0,0));
 
     sf::Text text;
-    sf::Text title_text;
-
-    cell.setFillColor(sf :: Color(204, 255, 255));
-    title.setFillColor(sf::Color(102, 102, 153));
-
-    title.setSize(sf::Vector2f(300, 60));
-    title.setPosition(700, 5);
-
     text.setFont(font);
-    text.setFillColor(sf :: Color :: Black);
-
-    title_text.setFont(font);
-    title_text.setFillColor(sf :: Color :: White);
-    title_text.setString("Hash Table");
-    title_text.setPosition(780, 10);
-
+    text.setFillColor(sf :: Color :: White);
 
     for (int i = 0; i < size; i++) {
         for (int k = 0; k < 2; k++) {
             if (k % 2 == 0) {
                 cell.setSize(sf::Vector2f(70, 60));
-                cell.setPosition(700 , 70 + i * 62);
+                cell.setPosition(700 , 100 + i * 62);
             }
             else {
-                cell.setSize(sf::Vector2f(300, 60));
-                cell.setPosition(700 + 72, 70 + i * 62);
+                cell.setSize(sf::Vector2f(400, 60));
+                cell.setPosition(700 + 72, 100 + i * 62);
             }
             window.draw(cell);
         }
@@ -77,22 +107,26 @@ void Hash::displayMap(sf :: RenderWindow &window, sf::Font &font) {
 
     for (int elem = 0; elem < size; elem++) {
         text.setString(to_string(elem));
-        text.setPosition(700, 70 + elem * 62);
+        text.setPosition(700, 100 + elem * 62);
         window.draw(text);
         int gap = 0;
         for (auto x : map[elem]) {
             text.setString(to_string(x));
-            text.setPosition(700 + 72 + gap * 60, 70 + elem * 62);
+            text.setPosition(700 + 72 + gap * 60, 100 + elem * 62);
             window.draw(text);
             gap++;
         }
     }
-    window.draw(title);
-    window.draw(title_text);
 }
 
 int main() {
     bool menuOpen = true;
+    bool hashOpen = true;
+
+    sf::Texture menuTexture;
+    menuTexture.loadFromFile("menuBack.jpg");
+    sf::Sprite hashBack(menuTexture);
+    hashBack.scale(2.2, 2.2);
 
     sf::RenderWindow window(sf::VideoMode(1200, 700), "Main window");
     sf::Font font;
@@ -103,28 +137,37 @@ int main() {
 
     Menu menu(5);
 
-    int element = 0;
+    int element = -123321;
     int flagbtn = 0;
     Hash h(7);
 
-    Textbox textbox1(20, sf::Color::White, false);
+    Textbox textbox1(30, sf::Color::Black, false);
     textbox1.setFont(font);
-    textbox1.setPosition({ 10, 140 });
-    textbox1.setLimit(true, 5);
+    textbox1.setPosition({ 10, 180 });
+    textbox1.setLimit(true, 3);
 
-    Button insert_btn("Insert an element", { 270, 60 }, 30, sf::Color(102, 102, 153), sf::Color::White);
+    Button title("Hash Table", { 470, 60 }, 30, sf::Color(128, 64, 0), sf::Color::White);
+    title.setPosition({ 700, 10 });
+    title.setFont(font);
+
+    Button insert_btn("Insert an element", { 270, 60 }, 30, sf::Color(128, 64, 0), sf::Color::White);
     insert_btn.setPosition({ 5, 10 });
     insert_btn.setFont(font);
 
-    Button delete_btn("Delete an element", { 270, 60 }, 30, sf::Color(102, 102, 153), sf::Color::White);
+    Button delete_btn("Delete an element", { 270, 60 }, 30, sf::Color(128, 64, 0), sf::Color::White);
     delete_btn.setPosition({ 300, 10 });
     delete_btn.setFont(font);
 
+    Button menu_btn("Go to menu", { 270, 60 }, 30, sf::Color(128, 64, 0), sf::Color::White);
+    menu_btn.setPosition({ 5, 600 });
+    menu_btn.setFont(font);
+
     sf::Text action;
     action.setFont(font);
-    action.setFillColor(sf::Color::White);
+    action.setFillColor(sf::Color::Black);
+    action.Bold;
     action.setPosition(10, 90);
-    action.setCharacterSize(20);
+    action.setCharacterSize(30);
 
     while (window.isOpen())
     {
@@ -142,16 +185,17 @@ int main() {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
                     stringstream el(textbox1.getText());
                     el >> element;
-                    if (flagbtn == 1) {
+                    if (flagbtn == 1 && element >= 0) {
                         h.insertit(element);
                         h.displayMap(window, font);
                         flagbtn = 0;
                     }
-                    else if (flagbtn == 2) {
+                    else if (flagbtn == 2 && element >= 0) {
                         h.deleteit(element);
                         h.displayMap(window, font);
                         flagbtn = 0;
                     }
+                    
                     action.setString("");
                     textbox1.setSelected(false);
                     textbox1.deletestr();
@@ -162,39 +206,51 @@ int main() {
                 if (insert_btn.isMouseOver(window)) insert_btn.setBackColor(sf::Color::Red);
 
                 else if (delete_btn.isMouseOver(window)) delete_btn.setBackColor(sf::Color::Red);
+                else if (menu_btn.isMouseOver(window)) menu_btn.setBackColor(sf::Color::Red);
 
                 else {
-                    insert_btn.setBackColor(sf::Color(102, 102, 153));
-                    delete_btn.setBackColor(sf::Color(102, 102, 153));
+                    insert_btn.setBackColor(sf::Color(128, 64, 0));
+                    delete_btn.setBackColor(sf::Color(128, 64, 0));
+                    menu_btn.setBackColor(sf::Color(128, 64, 0));
                 }
                 break;
 
             case sf::Event::MouseButtonPressed:
                 if (insert_btn.isMouseOver(window)) {
-                    action.setString("Enter the element you want to add in a table\n(up to 3 numbers and press ESC):");
+                    action.setString("Enter the element you want to add in a table\n(up to 3 NUMBERS and press ESC):");
                     textbox1.setSelected(true);
                     flagbtn = 1;
                 }
                 else if (delete_btn.isMouseOver(window)) {
-                    action.setString("Enter the element you want to delete from a table\n(up to 3 numbers and press ESC):");
+                    action.setString("Enter the element you want to delete from a table\n(up to 3 NUMBERS and press ESC):");
                     textbox1.setSelected(true);
                     flagbtn = 2;
+                }
+                else if (menu_btn.isMouseOver(window)) {
+                    menuOpen = true;
                 }
             }
         }
         while (menuOpen)
         {
-            menu.draw();
+            bool ans = menu.draw();
+            if (!ans) { 
+                window.close();
+            }
             menuOpen = false;
    
         }
         window.clear();
+        window.draw(hashBack);
         window.draw(action);
         textbox1.drawTo(window);
+        title.drawTo(window);
+        menu_btn.drawTo(window);
         insert_btn.drawTo(window);
         delete_btn.drawTo(window);
         h.displayMap(window, font);
         window.display();
+
      }
     return 0;
 }

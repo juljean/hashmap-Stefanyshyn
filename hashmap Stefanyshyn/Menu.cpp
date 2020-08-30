@@ -9,20 +9,20 @@ Menu::~Menu() {
 
 }
 
-void Menu::draw() {
+bool Menu::draw() {
 	sf::RenderWindow MenuW(sf::VideoMode(1200, 700), "Menu Bar");
 	sf::Texture menuTexture;
-	menuTexture.loadFromFile("menuBack.jpg");
+	menuTexture.loadFromFile("hashBack.jpg");
 	sf::Sprite menuBack(menuTexture);
 	menuBack.scale(2.2, 2.2);
 
 	font.loadFromFile("font.ttf");
 
-	Button start_btn("Start", { 130, 60 }, 30, sf::Color(140, 140, 140), sf::Color::White);
+	Button start_btn("Start", { 130, 60 }, 30, sf::Color(0,0,0,95), sf::Color::White);
 	start_btn.setPosition({ 900, 120 });
 	start_btn.setFont(font);
 
-	Button exit_btn("Exit", { 130, 60 }, 30, sf::Color(140, 140, 140), sf::Color::White);
+	Button exit_btn("Exit", { 130, 60 }, 30, sf::Color(0, 0, 0, 95), sf::Color::White);
 	exit_btn.setPosition({ 900, 460 });
 	exit_btn.setFont(font);
 
@@ -46,15 +46,19 @@ void Menu::draw() {
 				else if (exit_btn.isMouseOver(MenuW)) exit_btn.setBackColor(sf::Color::Red);
 
 				else {
-					start_btn.setBackColor(sf::Color(140, 140, 140));
-					exit_btn.setBackColor(sf::Color(140, 140, 140));
+					start_btn.setBackColor(sf::Color(0, 0, 0, 95));
+					exit_btn.setBackColor(sf::Color(0, 0, 0, 95));
 				}
 				break;
 
 			case sf::Event::MouseButtonPressed:
-				if (start_btn.isMouseOver(MenuW) || exit_btn.isMouseOver(MenuW)) {
+				if (start_btn.isMouseOver(MenuW)) {
 					MenuW.close();
-					return;
+					return true;
+				} 
+				else if (exit_btn.isMouseOver(MenuW)) {
+					MenuW.close();
+					return false;
 				}
 			}
 		}
